@@ -1,19 +1,20 @@
-# Skill-Matcher-AI
-# A conceptual snippet for your DocuMind engine
-from langchain_community.document_loaders import PyPDFLoader
-from langchain.vectorstores import Chroma
-from langchain_openai import OpenAIEmbeddings
+# SkillMatch-AI: Resume-to-Job Alignment Utility
 
-def process_document(file_path):
-    # 1. Load the document
-    loader = PyPDFLoader(file_path)
-    data = loader.load()
-    
-    # 2. Create Embeddings & Store in Vector DB
-    # This is the "Industry Level" part - using a Vector Store
-    vectorstore = Chroma.from_documents(documents=data, embedding=OpenAIEmbeddings())
-    
-    return vectorstore
+## 🎯 The Why
+In a competitive job market, candidates often struggle to understand if their resume is tailored for a specific role. This utility provides a quantitative alignment score between a resume and a job description, helping candidates optimize their profiles for ATS systems.
 
-# 3. Future Step: Integrate with an LLM (LangChain) to answer questions
-print("Document processed and vectorized into database.")
+## 🚀 Key Features
+* **Quantitative Analysis**: Calculates a percentage-based match score between text inputs.
+* **Status Classification**: Categorizes alignment as "Strong Match" or "Needs Improvement."
+* **Lightweight**: Zero-dependency implementation using Python's standard `difflib`.
+
+## 🛠 Tech Stack
+| Category | Technology |
+| :--- | :--- |
+| **Language** | Python (3.x) |
+| **Algorithm** | Levenshtein Distance (SequenceMatcher) |
+
+## ⚙️ How to Run
+1. **Clone the repository**:
+   ```bash
+   git clone [https://github.com/imarpitajaiswal/Skill-Matcher-AI](https://github.com/imarpitajaiswal/Skill-Matcher-AI)
