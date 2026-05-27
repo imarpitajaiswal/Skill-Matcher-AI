@@ -36,6 +36,9 @@ def generate_ats_pdf(name, email, phone, optimized_content):
     pdf.ln(5)
     
     # Body Content
+    # Replacing unicode characters that might break standard FPDF fonts
+    optimized_content = optimized_content.replace('\u2022', '-')
+    
     pdf.set_font("Helvetica", size=11)
     pdf.multi_cell(0, 6, optimized_content)
     
@@ -63,9 +66,10 @@ def optimize_resume(raw_experience, job_description):
     {job_description}
     """
     
+    # Using Mixtral to avoid the decommissioned LLaMA 3 8B error
     response = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model="llama3-8b-8192",
+        model="mixtral-8x7b-32768",
         temperature=0.3, # Low temp for professional, deterministic output
     )
     return response.choices[0].message.content
@@ -75,7 +79,7 @@ st.title("📄 Semantic AI Resume Tailor")
 st.markdown("Instantly rewrite your experience to align with a target job description and generate an ATS-compliant PDF.")
 
 if not client:
-    st.error("⚠️ Groq API Key not found. Please add GROQ_API_KEY to your secrets.")
+    st.error("⚠️ Groq API Key not found. Please add GROQ_API_KEY to your Streamlit secrets.")
     st.stop()
 
 with st.form("resume_form"):
