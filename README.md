@@ -1,20 +1,51 @@
-# SkillMatch-AI: Resume-to-Job Alignment Utility
+# 📄 SkillMatch-AI: Generative ATS Resume Tailor
 
-## 🎯 The Why
-In a competitive job market, candidates often struggle to understand if their resume is tailored for a specific role. This utility provides a quantitative alignment score between a resume and a job description, helping candidates optimize their profiles for ATS systems.
+[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit App](https://img.shields.io/badge/Streamlit-Live_App-FF4B4B?logo=streamlit&logoColor=white)](https://skill-matcher-ai.streamlit.app/)
+[![Groq](https://img.shields.io/badge/Powered%20by-Groq%20%7C%20LLaMA%203-8A2BE2?style=flat)](https://groq.com/)
+
+A generative AI web application that actively rewrites and tailors your resume to perfectly align with a target job description, ensuring maximum Applicant Tracking System (ATS) compatibility.
+
+🔗 **[Live Application: SkillMatch-AI](https://skill-matcher-ai.streamlit.app/)**
+
+---
+
+## 🎯 The Architecture Upgrade (Why We Built This)
+
+Traditional resume matchers rely on simple keyword counting or basic string matching algorithms (like Levenshtein distance), which fail to understand semantic context (e.g., matching the term "Backend Developer" to "Server-side Engineer").
+
+**SkillMatch-AI** solves this by leveraging **LLaMA 3** to perform deep semantic analysis. It doesn't just grade a resume—it dynamically rewrites the user's bullet points to integrate missing keywords naturally and compiles the output into a strictly formatted, machine-readable PDF.
 
 ## 🚀 Key Features
-* **Quantitative Analysis**: Calculates a percentage-based match score between text inputs.
-* **Status Classification**: Categorizes alignment as "Strong Match" or "Needs Improvement."
-* **Lightweight**: Zero-dependency implementation using Python's standard `difflib`.
+
+* **Semantic AI Rewriting**: Uses LLaMA 3 (via Groq) to intelligently rewrite experience bullets to align with the contextual demands of specific job descriptions.
+* **ATS-Strict PDF Generation**: Programmatically compiles a clean, single-column, text-only PDF using `fpdf2`—the exact layout format required by strict enterprise ATS parsers.
+* **Ultra-Low Latency Inference**: Powered by the Groq LPU inference engine for near-instantaneous generative text streaming.
+* **Modern UI**: Built on Streamlit for a clean, responsive, and intuitive user experience with built-in loading states.
 
 ## 🛠 Tech Stack
-| Category | Technology |
-| :--- | :--- |
-| **Language** | Python (3.14) |
-| **Algorithm** | Levenshtein Distance (SequenceMatcher) |
 
-## ⚙️ How to Run
-1. **Clone the repository**:
-   ```bash
-   git clone [https://github.com/imarpitajaiswal/Skill-Matcher-AI](https://github.com/imarpitajaiswal/Skill-Matcher-AI)
+| Component | Technology |
+| :--- | :--- |
+| **Frontend & UI** | Streamlit |
+| **LLM & Inference** | LLaMA 3 (8B), Groq API |
+| **PDF Compilation** | `fpdf2` |
+| **Language** | Python 3.11+ |
+
+---
+
+## ⚙️ Local Installation & Setup
+
+If you want to run this generative AI tool on your local machine, follow these precise steps:
+
+### 🌬️ Set up the Environment :
+python3 -m venv venv
+source venv/bin/activate  # On Windows use: venv\Scripts\activate
+pip install -r requirements.txt
+
+### 😌 Add your API Key:
+export GROQ_API_KEY="your_actual_groq_api_key_here"
+
+### ⌛️ RUN THE APPLICATION:
+streamlit run app.py
+
