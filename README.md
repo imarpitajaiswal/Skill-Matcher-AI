@@ -11,7 +11,7 @@ In a competitive job market, candidates often struggle to understand if their re
 ## 🛠 Tech Stack
 | Category | Technology |
 | :--- | :--- |
-| **Language** | Python (3.x) |
+| **Language** | Python (3.14) |
 | **Algorithm** | Levenshtein Distance (SequenceMatcher) |
 
 ## ⚙️ How to Run
