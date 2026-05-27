@@ -8,7 +8,6 @@ import tempfile
 st.set_page_config(page_title="AI Resume Tailor & Generator", page_icon="📄", layout="centered")
 
 # --- INITIALIZE GROQ CLIENT ---
-# Expects GROQ_API_KEY to be set in the environment/secrets
 try:
     client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 except Exception as e:
@@ -36,7 +35,6 @@ def generate_ats_pdf(name, email, phone, optimized_content):
     pdf.ln(5)
     
     # Body Content
-    # Replacing unicode characters that might break standard FPDF fonts
     optimized_content = optimized_content.replace('\u2022', '-')
     
     pdf.set_font("Helvetica", size=11)
@@ -66,11 +64,11 @@ def optimize_resume(raw_experience, job_description):
     {job_description}
     """
     
-    # Using Mixtral to avoid the decommissioned LLaMA 3 8B error
+    # Using the current, active flagship model
     response = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
-        model="mixtral-8x7b-32768",
-        temperature=0.3, # Low temp for professional, deterministic output
+        model="llama-3.3-70b-versatile",
+        temperature=0.3, 
     )
     return response.choices[0].message.content
 
@@ -85,12 +83,14 @@ if not client:
 with st.form("resume_form"):
     st.subheader("1. Contact Details")
     col1, col2, col3 = st.columns(3)
+    
+    # ADDED autocomplete="off" to kill the browser ghost text
     with col1:
-        name = st.text_input("Full Name", placeholder="e.g., Arpita Jaiswal")
+        name = st.text_input("Full Name", placeholder="e.g., Arpita Jaiswal", autocomplete="off")
     with col2:
-        email = st.text_input("Email", placeholder="email@example.com")
+        email = st.text_input("Email", placeholder="email@example.com", autocomplete="off")
     with col3:
-        phone = st.text_input("Phone", placeholder="+91 ...")
+        phone = st.text_input("Phone", placeholder="+91 ...", autocomplete="off")
 
     st.subheader("2. Alignment Data")
     raw_exp = st.text_area("Your Raw Experience / Current Resume Text", height=150)
