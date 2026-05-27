@@ -1,7 +1,9 @@
 import streamlit as st
 import os
 from groq import Groq
-from fpdf import FPDF
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import tempfile
 
 # --- PAGE CONFIG ---
@@ -13,82 +15,81 @@ try:
 except Exception as e:
     client = None
 
-# --- HIGH-END ATS PDF GENERATOR ---
-class ATS_PDF(FPDF):
-    def header(self):
-        pass
-
-    def footer(self):
-        self.set_y(-15)
-        self.set_font("Helvetica", "I", 8)
-        self.set_text_color(128, 128, 128)
-        self.cell(0, 10, f"Page {self.page_no()}", align="C")
-
-def clean_text_for_pdf(text):
-    """Sanitizes LLM text to prevent FPDF compiler crashes from unsupported unicode."""
-    if not text: return ""
-    replacements = {
-        '“': '"', '”': '"', '‘': "'", '’': "'",
-        '—': '-', '–': '-', '\u2022': '-', '…': '...',
-        '**': '', '*': ''
-    }
-    for k, v in replacements.items():
-        text = text.replace(k, v)
-    # Force drop any remaining invisible/unsupported unicode characters
-    return text.encode('latin-1', 'ignore').decode('latin-1')
-
+# --- ENTERPRISE PDF GENERATOR (REPORTLAB) ---
 def generate_industry_pdf(name, email, phone, linkedin, github, optimized_content):
-    pdf = ATS_PDF(orientation="P", unit="mm", format="A4")
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    # Create temp file
+    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     
-    # --- HEADER SECTION ---
-    pdf.set_font("Helvetica", style="B", size=22)
-    pdf.set_text_color(0, 0, 0)
-    pdf.cell(0, 10, clean_text_for_pdf(name).upper(), ln=True, align="C")
+    # Setup Document
+    doc = SimpleDocTemplate(temp_pdf.name, pagesize=letter,
+                            rightMargin=36, leftMargin=36,
+                            topMargin=36, bottomMargin=18)
     
-    # Contact Info
-    pdf.set_font("Helvetica", size=10)
-    contact_info = f"{clean_text_for_pdf(email)}  |  {clean_text_for_pdf(phone)}"
-    if linkedin: contact_info += f"  |  {clean_text_for_pdf(linkedin)}"
-    if github: contact_info += f"  |  {clean_text_for_pdf(github)}"
-    pdf.cell(0, 6, contact_info, ln=True, align="C")
+    styles = getSampleStyleSheet()
     
-    # Horizontal Divider
-    pdf.ln(2)
-    pdf.line(pdf.get_x(), pdf.get_y(), pdf.get_x() + 190, pdf.get_y())
-    pdf.ln(5)
+    # Custom Styles for ATS Readability
+    title_style = ParagraphStyle(
+        'TitleStyle', parent=styles['Heading1'], fontName='Helvetica-Bold',
+        fontSize=20, alignment=1, spaceAfter=6 # 1 = Center
+    )
+    contact_style = ParagraphStyle(
+        'ContactStyle', parent=styles['Normal'], fontName='Helvetica',
+        fontSize=10, alignment=1, spaceAfter=12
+    )
+    header_style = ParagraphStyle(
+        'HeaderStyle', parent=styles['Heading2'], fontName='Helvetica-Bold',
+        fontSize=12, spaceBefore=12, spaceAfter=6, textTransform='uppercase'
+    )
+    sub_header_style = ParagraphStyle(
+        'SubHeaderStyle', parent=styles['Heading3'], fontName='Helvetica-Bold',
+        fontSize=11, spaceBefore=6, spaceAfter=2
+    )
+    body_style = ParagraphStyle(
+        'BodyStyle', parent=styles['Normal'], fontName='Helvetica',
+        fontSize=10, leading=14, spaceAfter=4
+    )
+    bullet_style = ParagraphStyle(
+        'BulletStyle', parent=styles['Normal'], fontName='Helvetica',
+        fontSize=10, leading=14, leftIndent=15, firstLineIndent=-10, spaceAfter=4
+    )
+
+    flowables = []
+
+    # --- Header Construction ---
+    flowables.append(Paragraph(name.upper(), title_style))
     
-    # --- BODY CONTENT (Markdown Parser) ---
-    content = clean_text_for_pdf(optimized_content)
+    contact_info = f"{email} | {phone}"
+    if linkedin: contact_info += f" | {linkedin}"
+    if github: contact_info += f" | {github}"
+    flowables.append(Paragraph(contact_info, contact_style))
+    
+    # --- Body Construction ---
+    # Clean markdown bolding (Reportlab uses HTML-like tags)
+    content = optimized_content.replace('**', '') 
     
     for line in content.split('\n'):
         line = line.strip()
         if not line:
-            pdf.ln(2)
             continue
             
         if line.startswith('# '):
-            pdf.ln(4)
-            pdf.set_font("Helvetica", "B", 14)
-            pdf.cell(0, 8, line.replace('# ', '').strip().upper(), ln=True)
-            pdf.line(pdf.get_x(), pdf.get_y(), pdf.get_x() + 190, pdf.get_y())
-            pdf.ln(2)
+            text = line.replace('# ', '').strip()
+            flowables.append(Paragraph(f"<b><u>{text}</u></b>", header_style))
         elif line.startswith('## '):
-            pdf.set_font("Helvetica", "B", 12)
-            pdf.cell(0, 6, line.replace('## ', '').strip(), ln=True)
+            text = line.replace('## ', '').strip()
+            flowables.append(Paragraph(text, sub_header_style))
         elif line.startswith('- '):
-            pdf.set_font("Helvetica", "", 10.5)
-            # Safe indentation that won't break margin math
-            pdf.multi_cell(0, 5, "    - " + line.replace('- ', '').strip())
+            text = line.replace('- ', '').strip()
+            # Clean up smart quotes or unicode bullets that might slip through
+            text = text.replace('•', '').strip()
+            flowables.append(Paragraph(f"&#8226; {text}", bullet_style))
         else:
-            pdf.set_font("Helvetica", "", 10.5)
-            pdf.multi_cell(0, 5, line)
+            flowables.append(Paragraph(line, body_style))
 
-    # Save to temp file
-    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    pdf.output(temp_pdf.name)
+    # Build PDF
+    doc.build(flowables)
     return temp_pdf.name
+
 
 # --- AI LOGIC (FAANG LEVEL) ---
 def optimize_resume(raw_experience, job_description):
