@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import re
 from groq import Groq
 from fpdf import FPDF
 import tempfile
@@ -17,15 +16,26 @@ except Exception as e:
 # --- HIGH-END ATS PDF GENERATOR ---
 class ATS_PDF(FPDF):
     def header(self):
-        # Empty header to protect ATS readability
         pass
 
     def footer(self):
-        # Clean page numbers
         self.set_y(-15)
         self.set_font("Helvetica", "I", 8)
         self.set_text_color(128, 128, 128)
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
+
+def clean_text_for_pdf(text):
+    """Sanitizes LLM text to prevent FPDF compiler crashes from unsupported unicode."""
+    if not text: return ""
+    replacements = {
+        '“': '"', '”': '"', '‘': "'", '’': "'",
+        '—': '-', '–': '-', '\u2022': '-', '…': '...',
+        '**': '', '*': ''
+    }
+    for k, v in replacements.items():
+        text = text.replace(k, v)
+    # Force drop any remaining invisible/unsupported unicode characters
+    return text.encode('latin-1', 'ignore').decode('latin-1')
 
 def generate_industry_pdf(name, email, phone, linkedin, github, optimized_content):
     pdf = ATS_PDF(orientation="P", unit="mm", format="A4")
@@ -33,16 +43,15 @@ def generate_industry_pdf(name, email, phone, linkedin, github, optimized_conten
     pdf.set_auto_page_break(auto=True, margin=15)
     
     # --- HEADER SECTION ---
-    # Name
     pdf.set_font("Helvetica", style="B", size=22)
     pdf.set_text_color(0, 0, 0)
-    pdf.cell(0, 10, name.upper(), ln=True, align="C")
+    pdf.cell(0, 10, clean_text_for_pdf(name).upper(), ln=True, align="C")
     
     # Contact Info
     pdf.set_font("Helvetica", size=10)
-    contact_info = f"{email}  |  {phone}"
-    if linkedin: contact_info += f"  |  {linkedin}"
-    if github: contact_info += f"  |  {github}"
+    contact_info = f"{clean_text_for_pdf(email)}  |  {clean_text_for_pdf(phone)}"
+    if linkedin: contact_info += f"  |  {clean_text_for_pdf(linkedin)}"
+    if github: contact_info += f"  |  {clean_text_for_pdf(github)}"
     pdf.cell(0, 6, contact_info, ln=True, align="C")
     
     # Horizontal Divider
@@ -51,32 +60,30 @@ def generate_industry_pdf(name, email, phone, linkedin, github, optimized_conten
     pdf.ln(5)
     
     # --- BODY CONTENT (Markdown Parser) ---
-    # We clean the LLM output to ensure fpdf2 can handle it
-    content = optimized_content.replace('**', '').replace('\u2022', '-') # Fallback stripping if markdown fails
+    content = clean_text_for_pdf(optimized_content)
     
-    pdf.set_font("Helvetica", size=11)
-    
-    # Basic bolding parser for sections
     for line in content.split('\n'):
-        if line.strip().startswith('# '):
+        line = line.strip()
+        if not line:
+            pdf.ln(2)
+            continue
+            
+        if line.startswith('# '):
             pdf.ln(4)
             pdf.set_font("Helvetica", "B", 14)
             pdf.cell(0, 8, line.replace('# ', '').strip().upper(), ln=True)
             pdf.line(pdf.get_x(), pdf.get_y(), pdf.get_x() + 190, pdf.get_y())
             pdf.ln(2)
-        elif line.strip().startswith('## '):
+        elif line.startswith('## '):
             pdf.set_font("Helvetica", "B", 12)
             pdf.cell(0, 6, line.replace('## ', '').strip(), ln=True)
-        elif line.strip().startswith('- '):
+        elif line.startswith('- '):
             pdf.set_font("Helvetica", "", 10.5)
-            # Indent bullets perfectly for ATS
-            pdf.set_x(15)
-            pdf.multi_cell(0, 5, chr(149) + " " + line.replace('- ', '').strip())
-        elif line.strip() == "":
-            pdf.ln(2)
+            # Safe indentation that won't break margin math
+            pdf.multi_cell(0, 5, "    - " + line.replace('- ', '').strip())
         else:
             pdf.set_font("Helvetica", "", 10.5)
-            pdf.multi_cell(0, 5, line.strip())
+            pdf.multi_cell(0, 5, line)
 
     # Save to temp file
     temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
@@ -123,7 +130,7 @@ def optimize_resume(raw_experience, job_description):
     response = client.chat.completions.create(
         messages=[{"role": "user", "content": prompt}],
         model="llama-3.3-70b-versatile",
-        temperature=0.2, # Extremely low temperature for strict, analytical formatting
+        temperature=0.2, 
     )
     return response.choices[0].message.content
 
