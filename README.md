@@ -1,51 +1,246 @@
-# 📄 SkillMatch-AI: Generative ATS Resume Tailor
+# 🚀 SkillMatch AI
 
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-Live_App-FF4B4B?logo=streamlit&logoColor=white)](https://skill-matcher-ai.streamlit.app/)
-[![Groq](https://img.shields.io/badge/Powered%20by-Groq%20%7C%20LLaMA%203-8A2BE2?style=flat)](https://groq.com/)
+### AI-Powered Career Intelligence Platform for Resume Optimization and Job Alignment
 
-A generative AI web application that actively rewrites and tailors your resume to perfectly align with a target job description, ensuring maximum Applicant Tracking System (ATS) compatibility.
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)]()
+[![Streamlit](https://img.shields.io/badge/Frontend-Streamlit-FF4B4B.svg)]()
+[![Llama 3](https://img.shields.io/badge/LLM-Llama%203-purple.svg)]()
+[![Groq](https://img.shields.io/badge/Inference-Groq-orange.svg)]()
+[![PDF Generation](https://img.shields.io/badge/PDF-FPDF2-red.svg)]()
 
-🔗 **[Live Application: SkillMatch-AI](https://skill-matcher-ai.streamlit.app/)**
+## 🌐 Live Demo
 
----
-
-## 🎯 The Architecture Upgrade (Why We Built This)
-
-Traditional resume matchers rely on simple keyword counting or basic string matching algorithms (like Levenshtein distance), which fail to understand semantic context (e.g., matching the term "Backend Developer" to "Server-side Engineer").
-
-**SkillMatch-AI** solves this by leveraging **LLaMA 3** to perform deep semantic analysis. It doesn't just grade a resume—it dynamically rewrites the user's bullet points to integrate missing keywords naturally and compiles the output into a strictly formatted, machine-readable PDF.
-
-## 🚀 Key Features
-
-* **Semantic AI Rewriting**: Uses LLaMA 3 (via Groq) to intelligently rewrite experience bullets to align with the contextual demands of specific job descriptions.
-* **ATS-Strict PDF Generation**: Programmatically compiles a clean, single-column, text-only PDF using `fpdf2`—the exact layout format required by strict enterprise ATS parsers.
-* **Ultra-Low Latency Inference**: Powered by the Groq LPU inference engine for near-instantaneous generative text streaming.
-* **Modern UI**: Built on Streamlit for a clean, responsive, and intuitive user experience with built-in loading states.
-
-## 🛠 Tech Stack
-
-| Component | Technology |
-| :--- | :--- |
-| **Frontend & UI** | Streamlit |
-| **LLM & Inference** | LLaMA 3 (8B), Groq API |
-| **PDF Compilation** | `fpdf2` |
-| **Language** | Python 3.11+ |
+👉 **Try the Application:** https://skill-matcher-ai.streamlit.app/
 
 ---
 
-## ⚙️ Local Installation & Setup
+## 📸 Application Preview
 
-If you want to run this generative AI tool on your local machine, follow these precise steps:
+### Resume Analysis Dashboard
 
-### 🌬️ Set up the Environment :
-python3 -m venv venv
-source venv/bin/activate  # On Windows use: venv\Scripts\activate
+```text
+[ Add Screenshot Here ]
+screenshots/dashboard.png
+```
+
+### ATS Optimization Results
+
+```text
+[ Add Screenshot Here ]
+screenshots/ats-analysis.png
+```
+
+### AI Resume Rewriter
+
+```text
+[ Add Screenshot Here ]
+screenshots/resume-rewrite.png
+```
+
+### Generated ATS-Optimized Resume
+
+```text
+[ Add Screenshot Here ]
+screenshots/final-pdf.png
+```
+
+---
+
+## 🎯 What Problem Does This Solve?
+
+Job seekers often submit dozens of applications without understanding why their resumes fail to pass Applicant Tracking Systems (ATS).
+
+Traditional ATS tools:
+
+❌ Count keywords
+
+❌ Ignore semantic meaning
+
+❌ Provide generic feedback
+
+❌ Fail to optimize content intelligently
+
+SkillMatch AI uses Generative AI to analyze both the candidate's resume and the target job description, identify skill gaps, and automatically generate ATS-optimized content tailored to the role.
+
+---
+
+## ✨ Key Features
+
+### 🧠 Semantic Resume Analysis
+
+Move beyond keyword matching.
+
+The platform understands contextual relationships between:
+
+* Skills
+* Experience
+* Technologies
+* Responsibilities
+* Job Requirements
+
+---
+
+### 🤖 AI Resume Rewriter
+
+Uses Llama 3 to:
+
+* Rewrite experience bullets
+* Improve professional language
+* Add missing keywords naturally
+* Increase role alignment
+
+---
+
+### 📊 ATS Compatibility Enhancement
+
+Generates resumes optimized for ATS parsing through:
+
+* Single-column layouts
+* Standard section formatting
+* Text-first design
+* Machine-readable structure
+
+---
+
+### 🔍 Skill Gap Detection
+
+Identifies:
+
+* Missing skills
+* Industry keywords
+* Emerging technologies
+* Recommended competencies
+
+---
+
+### 📄 One-Click PDF Generation
+
+Generate export-ready ATS-compatible resumes instantly.
+
+Output:
+
+* Professional formatting
+* ATS-friendly structure
+* Ready-to-submit PDF
+
+---
+
+## 🏗 Architecture Overview
+
+Resume Upload
+
+*
+
+Job Description
+
+↓
+
+Semantic Analysis Engine
+
+↓
+
+Llama 3 Optimization Layer
+
+↓
+
+Resume Rewriting Workflow
+
+↓
+
+ATS Validation Layer
+
+↓
+
+PDF Generation Engine
+
+↓
+
+Final Optimized Resume
+
+---
+
+## 🛠 Technology Stack
+
+| Category           | Technology         |
+| ------------------ | ------------------ |
+| Language           | Python             |
+| Frontend           | Streamlit          |
+| LLM                | Llama 3            |
+| Inference Provider | Groq               |
+| PDF Generation     | FPDF2              |
+| Deployment         | Streamlit Cloud    |
+| AI Workflow        | Prompt Engineering |
+
+---
+
+## 🚀 Quick Start
+
+### Clone Repository
+
+```bash
+git clone https://github.com/imarpitajaiswal/Skill-Matcher-AI.git
+cd Skill-Matcher-AI
+```
+
+### Create Virtual Environment
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+### Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-### 😌 Add your API Key:
-export GROQ_API_KEY="your_actual_groq_api_key_here"
+### Configure Environment Variables
 
-### ⌛️ RUN THE APPLICATION:
+```bash
+export GROQ_API_KEY="your_groq_api_key"
+```
+
+### Run Application
+
+```bash
 streamlit run app.py
+```
 
+---
+
+## 💼 Business Impact
+
+SkillMatch AI demonstrates how Generative AI can improve career development workflows through:
+
+* Resume personalization
+* ATS optimization
+* Skill gap analysis
+* Application acceleration
+* Career intelligence insights
+
+---
+
+## 🎓 Skills Demonstrated
+
+* Generative AI
+* Prompt Engineering
+* LLM Applications
+* Semantic Matching
+* Streamlit Development
+* Career Intelligence Systems
+* Document Automation
+* ATS Optimization
+* Human-AI Collaboration
+
+---
+
+## 👩‍💻 Author
+
+Arpita Jaiswal
+
+AI Engineer | Generative AI | Agentic AI Systems | Enterprise AI Solutions
+
+LinkedIn: https://linkedin.com/in/imarpitajaiswal
+
+GitHub: https://github.com/imarpitajaiswal
